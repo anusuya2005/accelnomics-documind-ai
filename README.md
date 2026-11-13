@@ -44,8 +44,8 @@ ollama pull nomic-embed-text
 ## Setup
 
 ```powershell
-git clone <this repository>
-cd <folder>
+git clone https://github.com/anusuya2005/accelnomics-documind-ai.git
+cd accelnomics-documind-ai
 # 1. Python environment and libraries
 python -m venv .venv
 .venv\Scripts\Activate.ps1
