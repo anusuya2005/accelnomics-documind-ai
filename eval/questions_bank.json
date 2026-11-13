@@ -1,0 +1,22 @@
+[
+ {"id":1,"kind":"clear","user":"hr_anu","q":"How many days of annual leave does an employee get per year?","expect_doc":"hr_leave_policy.docx","expect_words":["24"]},
+ {"id":2,"kind":"clear","user":"hr_anu","q":"How long is maternity leave?","expect_doc":"hr_leave_policy.docx","expect_words":["26"]},
+ {"id":3,"kind":"clear","user":"hr_anu","q":"Above what value must a gift be declared?","expect_doc":"hr_code_of_conduct.pdf","expect_words":["2,000"]},
+ {"id":4,"kind":"clear","user":"hr_anu","q":"Within how many hours must suspected fraud be reported?","expect_doc":"hr_code_of_conduct.pdf","expect_words":["24"]},
+ {"id":5,"kind":"clear","user":"it_ravi","q":"What is the minimum password length?","expect_doc":"it_password_policy.docx","expect_words":["12"]},
+ {"id":6,"kind":"clear","user":"it_ravi","q":"After how many failed sign-in attempts is an account locked?","expect_doc":"it_password_policy.docx","expect_words":["5"]},
+ {"id":7,"kind":"clear","user":"it_ravi","q":"How quickly must a suspected customer data breach be reported to the Compliance Officer?","expect_doc":"it_incident_response.txt","expect_words":["2 hours"]},
+ {"id":8,"kind":"clear","user":"it_ravi","q":"Which extension do I call to report phishing?","expect_doc":"it_incident_response.txt","expect_words":["4455"]},
+ {"id":9,"kind":"clear","user":"fin_meena","q":"Up to what amount can the Branch Manager approve a personal loan?","expect_doc":"fin_loan_approval_policy.pdf","expect_words":["5,00,000"]},
+ {"id":10,"kind":"clear","user":"fin_meena","q":"What is the minimum credit score for a personal loan?","expect_doc":"fin_loan_approval_policy.pdf","expect_words":["700"]},
+ {"id":11,"kind":"clear","user":"fin_meena","q":"How often is re-KYC needed for high-risk customers?","expect_doc":"fin_kyc_procedure.docx","expect_words":["2 years"]},
+ {"id":12,"kind":"conflict","user":"fin_meena","q":"What is the annual fee for a debit card?","expect_doc":"fin_fee_schedule_2025.txt","expect_words":["250"]},
+ {"id":13,"kind":"conflict","user":"fin_meena","q":"What is the minimum balance for a savings account?","expect_doc":"fin_fee_schedule_2025.txt","expect_words":["3,000"]},
+ {"id":14,"kind":"other_department","user":"hr_anu","q":"What is the interest rate on personal loans?","expect_status":"no_evidence"},
+ {"id":15,"kind":"other_department","user":"hr_anu","q":"After how many failed attempts is an account locked?","expect_status":"no_evidence"},
+ {"id":16,"kind":"other_department","user":"it_ravi","q":"How many days of annual leave do employees get?","expect_status":"no_evidence"},
+ {"id":17,"kind":"other_department","user":"it_ravi","q":"What is the minimum credit score for a personal loan?","expect_status":"no_evidence"},
+ {"id":18,"kind":"other_department","user":"fin_meena","q":"What are the password rules?","expect_status":"no_evidence"},
+ {"id":19,"kind":"nowhere","user":"hr_anu","q":"What is the bank's dress code?","expect_status":"no_evidence"},
+ {"id":20,"kind":"known_limitation","user":"fin_meena","q":"What is the interest rate on a home loan?","expect_status":"no_evidence"}
+]

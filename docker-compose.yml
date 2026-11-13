@@ -1,0 +1,55 @@
+# Accelnomics DocuMind AI on a server.  Start:  docker compose up -d --build
+services:
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    volumes:
+      - ollama_models:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    # No "ports" here on purpose: only the app container can reach Ollama.
+
+  models:                       # downloads the two models once, then exits (needs internet the first time)
+    image: ollama/ollama:latest
+    depends_on:
+      ollama:
+        condition: service_healthy
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+    entrypoint: ["/bin/sh", "-c", "ollama pull gemma3:latest && ollama pull nomic-embed-text"]
+    restart: "no"
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      ollama:
+        condition: service_healthy
+    environment:
+      OLLAMA_URL: http://ollama:11434
+    volumes:
+      - documind_data:/app/data      # database, vectors and uploaded files
+    ports:
+      - "${BIND:-127.0.0.1}:8000:8000"   # change BIND in .env to 0.0.0.0 to let the company network in
+
+  caddy:                        # optional HTTPS in front of the app:  docker compose --profile https up -d
+    image: caddy:2
+    profiles: ["https"]
+    restart: unless-stopped
+    depends_on: [app]
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:-localhost}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+
+volumes:
+  ollama_models:
+  documind_data:
+  caddy_data:

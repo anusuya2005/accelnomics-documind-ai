@@ -1,0 +1,17 @@
+.venv
+node_modules
+frontend/node_modules
+frontend/dist
+data
+data_backup_*
+logs
+learning
+tests
+eval
+docs
+__pycache__
+*.pyc
+*.zip
+password.txt
+.env
+.git

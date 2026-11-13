@@ -1,0 +1,12 @@
+[
+ {"id":1,"kind":"clear","user":"hr_anu","q":"How many days per week can employees work remotely?","expect_doc":"remote_2024.txt","expect_words":["three"]},
+ {"id":2,"kind":"clear","user":"it_ravi","q":"How many failed sign-in attempts lock the VPN?","expect_doc":"vpn_notes.txt","expect_words":["3"]},
+ {"id":3,"kind":"nowhere","user":"hr_anu","q":"What is the cafeteria menu on Fridays?","expect_status":"no_evidence"},
+ {"id":4,"kind":"other_department","user":"it_ravi","q":"How many days per week can employees work remotely?","expect_status":"no_evidence"},
+ {"id":5,"kind":"other_department","user":"hr_anu","q":"How many failed sign-in attempts lock the VPN?","expect_status":"no_evidence"},
+ {"id":6,"kind":"clear","user":"it_ravi","q":"What should I do if I forget my VPN password?","expect_doc":"vpn_notes.txt","expect_words":["service desk"]},
+ {"id":7,"kind":"nowhere","user":"it_ravi","q":"What is the company's maternity leave policy?","expect_status":"no_evidence"},
+ {"id":8,"kind":"nowhere","user":"hr_anu","q":"What is the admin password of the server?","expect_status":"no_evidence"},
+ {"id":9,"kind":"other_department","user":"hr_anu","q":"How do I reset my VPN token?","expect_status":"no_evidence"},
+ {"id":10,"kind":"conflict","user":"hr_anu","q":"How many remote days are allowed per week?","expect_doc":"remote_2024.txt","expect_words":["three"]}
+]

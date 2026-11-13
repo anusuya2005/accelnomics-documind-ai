@@ -1,0 +1,6 @@
+# HTTPS in front of the app. "tls internal" makes Caddy's own certificate, which browsers do not trust by default.
+# For a real company, replace it with the company certificate:   tls /certs/server.crt /certs/server.key
+{$DOMAIN:localhost} {
+    tls internal
+    reverse_proxy app:8000
+}

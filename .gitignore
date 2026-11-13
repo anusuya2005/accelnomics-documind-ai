@@ -1,0 +1,32 @@
+﻿# Private Python environment (recreated by setup)
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Runtime data: users, sessions, search index, uploaded files. Never publish.
+data/
+
+# Frontend build output and installed packages (recreated by npm)
+frontend/node_modules/
+frontend/dist/
+
+# Backups, old copies and notes
+*.bak
+*.bak8000
+frontend/src_backup*/
+frontend/dist_backup/
+src_backup*/
+dist_backup/
+password.txt
+*.log
+logs/
+
+# Secrets and editor files
+.env
+.env.*
+.vscode/
+.DS_Store
+data_backup_*/
+data_backup_*/
