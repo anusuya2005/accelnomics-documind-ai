@@ -1,202 +1,124 @@
-# 🛠️ AI IT Helpdesk Agent
+# Accelnomics DocuMind AI
 
-An **agentic AI system** that diagnoses common IT issues and recommends
-troubleshooting steps using **RAG (Retrieval-Augmented Generation)**,
-**Tool Calling**, and **Memory**.
+A privacy-first document assistant. Staff ask questions in plain English and get answers written only from their company's own documents, with the exact source shown beside every answer. The AI model and all data run on one computer. Nothing is sent to the internet.
 
-> Built as the Day 1 use-case project for the **TNSDC – IBM Agentic AI
-> Internship**, based on Use Case #4: *AI IT Helpdesk Agent — diagnoses
-> common technical issues and recommends troubleshooting steps using a
-> knowledge base.* Key agent capabilities: **Agent + RAG + Tools**.
+> **This is a prototype for learning and review, not a product for real company use.** All demo documents are fictional. It is not security-certified.
 
-![Python](https://img.shields.io/badge/python-3.9%2B-blue)
-![Flask](https://img.shields.io/badge/flask-3.x-black)
-![License](https://img.shields.io/badge/license-MIT-green)
-![Tests](https://img.shields.io/badge/tests-passing-brightgreen)
+## What it does
 
----
+- Answers questions from PDF, DOCX and TXT documents (retrieval-augmented generation).
+- Shows the source page next to each answer, with the matching sentences highlighted.
+- Says "Not found in your documents" instead of guessing.
+- Keeps each department's documents separate (HR, IT, Finance). The server enforces this.
+- Admin pages: Documents (upload, delete), Privacy (live checks) and Audit log (events only, never questions or answers).
+- Passwords are stored as Argon2 hashes, sessions expire after 8 hours, and 5 wrong passwords lock an account for 15 minutes.
 
-## ✨ Features
+## Tech stack
 
-- **RAG-based diagnosis** — a 27-article IT knowledge base (network,
-  hardware, software, account, email, security, performance, OS issues)
-  retrieved with a dependency-free TF-IDF + cosine-similarity engine.
-- **Tool calling** — the agent decides when to run simulated diagnostics
-  (network check, system resource check, service restart, ticket-history
-  search) and folds the results into its answer.
-- **Memory** — per-session conversation history, last-known issue
-  category, and an "unresolved streak" counter.
-- **Automatic escalation** — if the user reports the same issue is still
-  unresolved, the agent creates a real support ticket (persisted to
-  `data/tickets.json`) instead of looping forever.
-- **Clarifying questions** — low-confidence retrieval triggers a
-  follow-up question instead of a wrong guess.
-- **Two interfaces** — a chat **web UI** (Flask) and a **CLI** for quick
-  terminal demos.
-- **Zero mandatory API keys** — works fully offline out of the box.
-  Optionally plug in `ANTHROPIC_API_KEY` for LLM-enhanced natural-language
-  responses (falls back gracefully if not set).
-- **Unit tested** — retrieval, intent detection, and the full escalation
-  flow are covered under `tests/`.
+| Part | Technology |
+| --- | --- |
+| Frontend | React 19, TypeScript, Vite |
+| Backend | Python, FastAPI, Uvicorn |
+| Chat model | Ollama, `gemma3:latest` |
+| Search model | Ollama, `nomic-embed-text` |
+| Search storage | ChromaDB (local folder) |
+| Records | SQLite (users, documents, sessions, audit log) |
+| Tests | pytest (86 tests) and a 20-question evaluation |
 
----
+## How it works
 
-## 🧠 How it works (Agent + RAG + Tools + Memory)
+1. **Upload (admin):** read the file, split it into pieces of about 1000 characters, remove sentences that try to give orders to the AI, turn each piece into numbers (an embedding), and store it with its department.
+2. **Ask (staff):** turn the question into numbers, find the closest pieces from only that person's departments, re-check access in the database, let the local model write an answer from those pieces only, then have the server check the answer and build the source list.
 
-```
-User message
-   │
-   ▼
-Escalation / frustration check ──► (repeated failure) ──► create_ticket tool
-   │ (else)
-   ▼
-RAG retrieval over knowledge_base.json (TF-IDF cosine similarity)
-   │
-   ▼
-Tool triggers (network diagnostic / system check / service restart / ticket search)
-   │
-   ▼
-Response composer (template, or optional Claude LLM call)
-   │
-   ▼
-Reply + sources + tools used + escalation status  ──►  saved to session memory
+## Requirements (Windows)
+
+- Python 3.11 or newer
+- Node.js 20 or newer (only to build the frontend)
+- [Ollama](https://ollama.com) with two models:
+
+```powershell
+ollama pull gemma3
+ollama pull nomic-embed-text
 ```
 
-See [`docs/architecture.md`](docs/architecture.md) for the full breakdown.
+## Setup
 
----
-
-## 📁 Project structure
-
-```
-ai-it-helpdesk-agent/
-├── app.py                  # Flask web app (chat UI + JSON API)
-├── cli.py                  # Terminal chat interface
-├── requirements.txt
-├── LICENSE
-├── agent/
-│   ├── agent.py             # Orchestrator: Agent + RAG + Tools + Memory
-│   ├── rag.py                # Pure-Python TF-IDF retriever
-│   ├── tools.py               # Simulated IT support tools
-│   ├── memory.py              # Per-session conversation memory
-│   └── knowledge_base.py      # KB loader
-├── data/
-│   └── knowledge_base.json   # 27 IT-issue articles (source of truth for RAG)
-├── templates/index.html      # Chat UI markup
-├── static/style.css          # Chat UI styling
-├── static/script.js          # Chat UI logic (fetch → /api/chat)
-├── tests/test_agent.py       # Unit tests
-└── docs/architecture.md      # Architecture deep-dive
-```
-
----
-
-## 🚀 Getting started
-
-### 1. Clone & install
-
-```bash
-git clone https://github.com/<your-username>/ai-it-helpdesk-agent.git
-cd ai-it-helpdesk-agent
-python -m venv venv
-source venv/bin/activate      # Windows: venv\Scripts\activate
+```powershell
+git clone <this repository>
+cd <folder>
+# 1. Python environment and libraries
+python -m venv .venv
+.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
+# 2. Build the frontend
+cd frontend
+npm install
+npm run build
+cd ..
 ```
 
-### 2. Run the web app
+Then create an admin and a staff user (the script asks for a password; `--keep-password` skips the forced change at first login):
 
-```bash
-python app.py
+```powershell
+python create_user.py admin1 --role admin --keep-password
+python create_user.py staff1 --role staff --dept HR --keep-password
 ```
 
-Open **http://127.0.0.1:5000** and start chatting, e.g.:
-- "my wifi keeps disconnecting"
-- "printer won't print"
-- "I forgot my password"
-- "outlook is not syncing"
+## Run
 
-### 3. Or run the CLI
-
-```bash
-python cli.py
+```powershell
+.\start_app.ps1
 ```
 
-### 4. (Optional) Enable LLM-enhanced replies
+Open `http://127.0.0.1:8000`. The first answer can take up to about 40 seconds on a laptop because the model runs locally.
 
-```bash
-export ANTHROPIC_API_KEY=your_key_here   # Windows: set ANTHROPIC_API_KEY=...
-pip install anthropic
-python app.py
+## Load the demo documents
+
+1. Start the app (`.\start_app.ps1`) and wait about a minute.
+2. In a second terminal, in the same folder, run `.venv\Scripts\Activate.ps1` and then:
+
+```powershell
+python load_docs.py
 ```
 
-Without this, the agent still works perfectly using its built-in
-template-based response composer.
+Enter the `admin1` password when asked. The eight fictional files in `docs/` are uploaded to HR, IT and Finance and indexed. Then sign in at `http://127.0.0.1:8000`. Try `staff1` (HR only) to see that other departments' documents are not visible.
 
-### 5. Run the tests
+## Tests
 
-```bash
-python -m unittest discover -s tests -v
+```powershell
+python -m pytest tests -q          # 86 tests
+python eval\run_eval.py questions_bank.json   # 20-question evaluation (the app must be running)
 ```
 
----
+## What is not in this repository
 
-## 💬 Example conversation
+The `data` folder (SQLite database, ChromaDB search index, uploaded files), `.venv`, `node_modules`, logs and passwords are not stored here. They are created on your computer when you run the app and add documents. The AI models come from Ollama (`ollama pull`).
 
-```
-You: my wifi keeps disconnecting
+Open a new terminal each time you work on the project and run `.venv\Scripts\Activate.ps1` first.
 
-Assistant: This looks like it's related to Wi-Fi not connecting (Network).
-Here's what I'd try, in order:
-1. Toggle Wi-Fi off and on from the network settings panel.
-2. Forget the network and reconnect using the correct password.
-3. Restart the router/access point and wait 60 seconds before reconnecting.
-4. Update the wireless network adapter driver.
-5. Run the built-in network troubleshooter.
+## Project files
 
-Let me know if that resolves it, or tell me if it's still not working.
+| File | Job |
+| --- | --- |
+| `main.py` | API routes and login checks |
+| `security.py` | Password hashing and sessions |
+| `database.py` | SQLite records |
+| `readers.py`, `chunking.py` | Read PDF, DOCX, TXT and split into pieces |
+| `ollama_client.py` | Talks to the local models |
+| `vector_store.py` | ChromaDB storage and search |
+| `retrieval.py`, `permissions.py` | Find pieces and enforce department access |
+| `answering.py` | Writes the answer and builds the citations |
+| `frontend/` | React website |
+| `tests/`, `eval/` | Automated tests and the 20-question evaluation |
 
-You: still not working
-Assistant: Sorry that didn't fix it. Could you tell me exactly what happens
-now (any error message, or at which step it fails)? If the next attempt
-still doesn't work, I'll escalate this to a human technician for you.
+## Known limits and next steps
 
-You: still not working
-Assistant: I'm sorry the suggested steps haven't resolved this. I've
-escalated the issue to a human technician -- your ticket ID is TCK-9287
-(category: Network). They'll follow up with you shortly.
-```
+- Fictional data only. Not security-certified. Plain `http` on one computer.
+- Users are created by a command. An admin Users page, forced first-login password change, HTTPS and single sign-on are planned next.
+- About 40 seconds per answer on a laptop. Streaming answers and a stronger computer would help.
+- The evaluation has 20 questions, which is a small sample.
+- Scanned (image-only) PDFs are not tested.
 
----
+## Author
 
-## 🧩 Extending the project
-
-- **Bigger knowledge base**: add more entries to
-  `data/knowledge_base.json` — no code changes needed, the retriever
-  picks them up automatically.
-- **Real tools**: swap the simulated functions in `agent/tools.py` for
-  real integrations (e.g. a real ticketing API, an actual ping/ICMP
-  library, Active Directory password reset).
-- **Vector DB**: swap `agent/rag.py`'s TF-IDF retriever for FAISS/Chroma
-  without changing the agent's calling code — it's isolated behind a
-  simple `.query(text, top_k)` interface.
-- **Persistent, multi-user memory**: replace the per-session JSON files
-  in `agent/memory.py` with a real database.
-
----
-
-## 📚 About this project
-
-This repository implements **Use Case #4 — AI IT Helpdesk Agent** from the
-TNSDC × IBM *Agentic AI* internship's Day 1 use-case selection, where each
-student picks one use case and develops it into a full project across the
-program. The required agent capabilities for this use case — **Agent +
-RAG + Tools** — are all implemented, with **Memory** added on top to
-support multi-turn troubleshooting and automatic escalation.
-
-## 📄 License
-
-Released under the [MIT License](LICENSE).
-
-## Demo documents
-
-Eight fictional documents for HR, IT and Finance are in the `docs` folder. Sign in as an administrator and upload them on the Documents page, choosing the matching department.
+Anusuya V, final-year B.Tech Information Technology.
