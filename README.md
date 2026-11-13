@@ -122,3 +122,5 @@ Open a new terminal each time you work on the project and run `.venv\Scripts\Act
 ## Author
 
 Anusuya V, final-year B.Tech Information Technology.
+
+Note: 4 website tests are skipped until the frontend is built with `npm run build`.
